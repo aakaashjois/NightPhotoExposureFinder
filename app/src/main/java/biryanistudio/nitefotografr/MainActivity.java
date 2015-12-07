@@ -5,7 +5,9 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -171,8 +173,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 chosenCropType = position;
+                sensorTypeValue = Double.parseDouble(arraySensorCrop[position]);
                 spinnerSensorType.setSelection(position);
                 spinnerSensorType.setEnabled(false);
+                getFocalLength();
             }
 
             @Override
@@ -185,6 +189,26 @@ public class MainActivity extends AppCompatActivity {
     private void getFocalLength() {
 
         cardFocalLength.setVisibility(View.VISIBLE);
+        textFocalLength.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    inputFocalLength = Double.parseDouble(textFocalLength.getText().toString());
+                    textFocalLength.setEnabled(false);
+                    getShutterSpeed();
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
+
+    private void getShutterSpeed() {
+
+        cardShutterSpeed.setVisibility(View.VISIBLE);
+        shutterSpeed = 500 / (inputFocalLength * sensorTypeValue);
+        textTrail.setText("Greater than " + ((int) shutterSpeed + 1) + " seconds");
+        textStill.setText("Lesser than " + ((int) shutterSpeed - 1) + " seconds");
 
     }
 }

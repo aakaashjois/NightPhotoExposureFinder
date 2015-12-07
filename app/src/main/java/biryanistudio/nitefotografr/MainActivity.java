@@ -94,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
         arrayManufacturer = getResources().getStringArray(R.array.manufacturerList);
         ArrayAdapter<String> adapterManufacturer = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner_item_layout, arrayManufacturer);
         spinnerManufacturer.setAdapter(adapterManufacturer);
+        spinnerManufacturer.setEnabled(true);
         spinnerManufacturer.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -235,8 +236,10 @@ public class MainActivity extends AppCompatActivity {
         cardFocalLength.setVisibility(View.GONE);
         sensorTypeValue = -1.0;
         chosenCropType = -1;
+        textFocalLength.setText(null);
         radioCropFrame.setEnabled(true);
         radioFullFrame.setEnabled(true);
+        radioSensorType.clearCheck();
         chosenManufacturer = -1;
         cardSensorType.setVisibility(View.GONE);
         arraySensorCrop = new String[]{};

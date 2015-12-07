@@ -3,6 +3,7 @@ package biryanistudio.nitefotografr;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.view.KeyEvent;
@@ -95,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
         ArrayAdapter<String> adapterManufacturer = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner_item_layout, arrayManufacturer);
         spinnerManufacturer.setAdapter(adapterManufacturer);
         spinnerManufacturer.setEnabled(true);
+        //((TextView)spinnerManufacturer.getChildAt(0)).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textPrimary));
         spinnerManufacturer.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -105,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     spinnerManufacturer.setSelection(position);
                     spinnerManufacturer.setEnabled(false);
+                    //((TextView)spinnerManufacturer.getChildAt(0)).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textSecondary));
                     getCropType();
                 }
             }
@@ -118,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
 
     private void getCropType() {
         cardSensorType.setVisibility(View.VISIBLE);
@@ -176,6 +180,7 @@ public class MainActivity extends AppCompatActivity {
         ArrayAdapter<String> adapterSensorCrop = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner_item_layout, arraySensorCrop);
         spinnerSensorType.setAdapter(adapterSensorCrop);
         spinnerSensorType.setEnabled(true);
+        ((TextView) spinnerSensorType.getChildAt(0)).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textPrimary));
         spinnerSensorType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -183,6 +188,7 @@ public class MainActivity extends AppCompatActivity {
                 sensorTypeValue = Double.parseDouble(arraySensorCrop[position]);
                 spinnerSensorType.setSelection(position);
                 spinnerSensorType.setEnabled(false);
+                ((TextView) spinnerSensorType.getChildAt(0)).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textSecondary));
                 getFocalLength();
             }
 

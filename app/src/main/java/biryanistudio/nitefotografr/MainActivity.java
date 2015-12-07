@@ -53,8 +53,14 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Snackbar.make(view, "Reset everything?", Snackbar.LENGTH_LONG)
+                        .setAction("Yes", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                resetAll();
+                            }
+                        })
+                        .show();
             }
         });
 
@@ -207,8 +213,34 @@ public class MainActivity extends AppCompatActivity {
 
         cardShutterSpeed.setVisibility(View.VISIBLE);
         shutterSpeed = 500 / (inputFocalLength * sensorTypeValue);
-        textTrail.setText("Greater than " + ((int) shutterSpeed + 1) + " seconds");
-        textStill.setText("Lesser than " + ((int) shutterSpeed - 1) + " seconds");
+        String trail = getResources().getString(R.string.trail);
+        trail = trail + (String.valueOf(((int) shutterSpeed + 1)));
+        trail = trail + getResources().getString(R.string.seconds);
+        textTrail.setText(trail);
+        String still = getResources().getString(R.string.still);
+        still = still + (String.valueOf(((int) shutterSpeed - 1)));
+        still = still + getResources().getString(R.string.seconds);
+        textStill.setText(still);
 
+    }
+
+    private void resetAll() {
+
+        textStill.setText(null);
+        textTrail.setText(null);
+        shutterSpeed = -1.0;
+        cardShutterSpeed.setVisibility(View.GONE);
+        inputFocalLength = -1.0;
+        textFocalLength.setEnabled(true);
+        cardFocalLength.setVisibility(View.GONE);
+        sensorTypeValue = -1.0;
+        chosenCropType = -1;
+        radioCropFrame.setEnabled(true);
+        radioFullFrame.setEnabled(true);
+        chosenManufacturer = -1;
+        cardSensorType.setVisibility(View.GONE);
+        arraySensorCrop = new String[]{};
+        arrayManufacturer = new String[]{};
+        getManufacturer();
     }
 }

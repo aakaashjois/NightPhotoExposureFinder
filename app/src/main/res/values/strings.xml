@@ -11,6 +11,9 @@
     <string name="shutter">Shutter Speed:</string>
     <string name="shutterMax">For Trail:</string>
     <string name="shutterMin">For Still:</string>
+    <string name="seconds">\u0020 seconds.</string>
+    <string name="trail">Greater than \u0020</string>
+    <string name="still">Lesser than \u0020</string>
 
 
     <string-array name="manufacturerList">

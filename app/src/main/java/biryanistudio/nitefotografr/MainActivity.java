@@ -252,4 +252,5 @@ public class MainActivity extends AppCompatActivity {
         arrayManufacturer = new String[]{};
         getManufacturer();
     }
+
 }

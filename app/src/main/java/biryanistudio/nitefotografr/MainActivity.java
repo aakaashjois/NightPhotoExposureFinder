@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
         cardFocalLength.setVisibility(View.GONE);
         cardShutterSpeed.setVisibility(View.GONE);
 
-        root = (ViewGroup) findViewById(R.id.linearLayout);
+        root = (ViewGroup) findViewById(R.id.relativeLayout);
         interpolator = AnimationUtils.loadInterpolator(this, android.R.interpolator.linear_out_slow_in);
 
         Configuration configuration = getResources().getConfiguration();
@@ -267,10 +267,22 @@ public class MainActivity extends AppCompatActivity {
 
     private void resetAll() {
 
+        animateViewOut(root.getChildAt(count));
         cardShutterSpeed.setVisibility(View.GONE);
+        count--;
+
+        animateViewOut(root.getChildAt(count));
         cardFocalLength.setVisibility(View.GONE);
+        count--;
+
+        animateViewOut(root.getChildAt(count));
         cardSensorType.setVisibility(View.GONE);
+        count--;
+
+        animateViewOut(root.getChildAt(count));
         cardManufacturer.setVisibility(View.GONE);
+        count--;
+
 
         isFirstSelectManufacturer = true;
         chosenManufacturer = -1;
@@ -299,13 +311,27 @@ public class MainActivity extends AppCompatActivity {
     private void animateViewIn(View view) {
 
         view.setVisibility(View.VISIBLE);
-        view.setTranslationY(offset);
-        view.setAlpha(0.85f);
+        view.setTranslationY(-3 * offset);
+        view.setAlpha(0f);
         view.animate()
                 .translationY(0f)
                 .alpha(1f)
                 .setInterpolator(interpolator)
-                .setDuration(1000L)
+                .setDuration(1000)
+                .start();
+
+    }
+
+    private void animateViewOut(View view) {
+
+        view.setVisibility(View.VISIBLE);
+        view.setTranslationY(0f);
+        view.setAlpha(1f);
+        view.animate()
+                .translationY(-3 * offset)
+                .alpha(0f)
+                .setInterpolator(interpolator)
+                .setDuration(1000)
                 .start();
 
     }

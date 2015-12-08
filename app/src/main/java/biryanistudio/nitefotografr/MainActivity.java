@@ -1,6 +1,7 @@
 package biryanistudio.nitefotografr;
 
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     String[] arraySensorCrop = new String[]{};
 
     ViewGroup root;
+    View animationView;
     int count = 0;
     float offset = 0;
     Interpolator interpolator;
@@ -97,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
         cardFocalLength.setVisibility(View.GONE);
         cardShutterSpeed.setVisibility(View.GONE);
 
-        root = (ViewGroup) findViewById(R.id.relativeLayout);
+        root = (ViewGroup) findViewById(R.id.linearLayout);
         interpolator = AnimationUtils.loadInterpolator(this, android.R.interpolator.linear_out_slow_in);
 
         Configuration configuration = getResources().getConfiguration();
@@ -109,8 +111,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void getManufacturer() {
 
-        View view = root.getChildAt(count);
-        animateViewIn(view);
+        animationView = root.getChildAt(count);
+        animateViewIn(animationView);
+        animatePushUp(animationView);
         count++;
         arrayManufacturer = getResources().getStringArray(R.array.manufacturerList);
         ArrayAdapter<String> adapterManufacturer = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner_item_layout, arrayManufacturer);
@@ -129,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     spinnerManufacturer.setSelection(position);
                     spinnerManufacturer.setEnabled(false);
+                    animatePullDown(animationView);
                     getCropType();
                 }
             }
@@ -142,8 +146,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void getCropType() {
 
-        View view = root.getChildAt(count);
-        animateViewIn(view);
+        animationView = root.getChildAt(count);
+        animateViewIn(animationView);
+        animatePushUp(animationView);
         count++;
         spinnerSensorType.setVisibility(View.GONE);
         spinnerSensorType.setEnabled(false);
@@ -155,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
                     sensorTypeValue = 1.0;
                     radioFullFrame.setEnabled(false);
                     radioCropFrame.setEnabled(false);
+                    animatePullDown(animationView);
                     getFocalLength();
                 } else if (checkedId == R.id.radioCropFrame) {
                     switch (chosenManufacturer) {
@@ -166,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
                             sensorTypeValue = 1.5;
                             radioFullFrame.setEnabled(false);
                             radioCropFrame.setEnabled(false);
+                            animatePullDown(animationView);
                             getFocalLength();
                             break;
                         case 1:
@@ -216,6 +223,7 @@ public class MainActivity extends AppCompatActivity {
                     radioCropFrame.setEnabled(false);
                     radioFullFrame.setEnabled(false);
                     spinnerSensorType.setEnabled(false);
+                    animatePullDown(animationView);
                     getFocalLength();
 
                 }
@@ -229,9 +237,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void getFocalLength() {
 
-        View view = root.getChildAt(count);
-        animateViewIn(view);
+        animationView = root.getChildAt(count);
+        animateViewIn(animationView);
+        animatePushUp(animationView);
         count++;
+        textFocalLength.setEnabled(true);
         textFocalLength.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -239,6 +249,7 @@ public class MainActivity extends AppCompatActivity {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     inputFocalLength = Double.parseDouble(textFocalLength.getText().toString());
                     textFocalLength.setEnabled(false);
+                    animatePullDown(animationView);
                     getShutterSpeed();
                     return true;
                 }
@@ -250,9 +261,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void getShutterSpeed() {
 
-        View view = root.getChildAt(count);
-        animateViewIn(view);
-        count++;
+        animationView = root.getChildAt(count);
+        animateViewIn(animationView);
+        animatePushUp(animationView);
         shutterSpeed = 500 / (inputFocalLength * sensorTypeValue);
         String trail = getResources().getString(R.string.trail);
         trail = trail + (String.valueOf(((int) shutterSpeed + 1)));
@@ -267,22 +278,16 @@ public class MainActivity extends AppCompatActivity {
 
     private void resetAll() {
 
-        animateViewOut(root.getChildAt(count));
+        animatePullDown(animationView);
+
+        while (count >= 0) {
+            animateViewOut(root.getChildAt(count));
+            count--;
+        }
         cardShutterSpeed.setVisibility(View.GONE);
-        count--;
-
-        animateViewOut(root.getChildAt(count));
         cardFocalLength.setVisibility(View.GONE);
-        count--;
-
-        animateViewOut(root.getChildAt(count));
         cardSensorType.setVisibility(View.GONE);
-        count--;
-
-        animateViewOut(root.getChildAt(count));
         cardManufacturer.setVisibility(View.GONE);
-        count--;
-
 
         isFirstSelectManufacturer = true;
         chosenManufacturer = -1;
@@ -302,7 +307,6 @@ public class MainActivity extends AppCompatActivity {
         shutterSpeed = -1.0;
 
         inputFocalLength = -1.0;
-        textFocalLength.setEnabled(true);
         textFocalLength.setText(null);
 
         getManufacturer();
@@ -333,6 +337,32 @@ public class MainActivity extends AppCompatActivity {
                 .setInterpolator(interpolator)
                 .setDuration(1000)
                 .start();
+
+    }
+
+    private void animatePushUp(View view) {
+
+        view.setVisibility(View.VISIBLE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            view.animate()
+                    .translationZ(10f)
+                    .setInterpolator(interpolator)
+                    .setDuration(300)
+                    .start();
+        }
+
+    }
+
+    private void animatePullDown(View view) {
+
+        view.setVisibility(View.VISIBLE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            view.animate()
+                    .translationZ(-10f)
+                    .setInterpolator(interpolator)
+                    .setDuration(300)
+                    .start();
+        }
 
     }
 

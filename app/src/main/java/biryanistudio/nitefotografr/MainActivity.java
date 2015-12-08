@@ -1,5 +1,6 @@
 package biryanistudio.nitefotografr;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -7,6 +8,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.Interpolator;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -45,6 +49,11 @@ public class MainActivity extends AppCompatActivity {
 
     String[] arrayManufacturer = new String[]{};
     String[] arraySensorCrop = new String[]{};
+
+    ViewGroup root;
+    int count = 0;
+    float offset = 0;
+    Interpolator interpolator;
 
 
     @Override
@@ -88,17 +97,27 @@ public class MainActivity extends AppCompatActivity {
         cardFocalLength.setVisibility(View.GONE);
         cardShutterSpeed.setVisibility(View.GONE);
 
+        root = (ViewGroup) findViewById(R.id.linearLayout);
+        interpolator = AnimationUtils.loadInterpolator(this, android.R.interpolator.linear_out_slow_in);
+
+        Configuration configuration = getResources().getConfiguration();
+        offset = configuration.screenHeightDp;
+
         getManufacturer();
 
     }
 
     private void getManufacturer() {
-        cardManufacturer.setVisibility(View.VISIBLE);
+
+        View view = root.getChildAt(count);
+        animateViewIn(view);
+        count++;
         arrayManufacturer = getResources().getStringArray(R.array.manufacturerList);
         ArrayAdapter<String> adapterManufacturer = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner_item_layout, arrayManufacturer);
         spinnerManufacturer.setAdapter(adapterManufacturer);
         spinnerManufacturer.setEnabled(true);
         spinnerManufacturer.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 chosenManufacturer = position;
@@ -122,7 +141,11 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void getCropType() {
-        cardSensorType.setVisibility(View.VISIBLE);
+
+        View view = root.getChildAt(count);
+        animateViewIn(view);
+        count++;
+        spinnerSensorType.setVisibility(View.GONE);
         spinnerSensorType.setEnabled(false);
         radioSensorType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -178,6 +201,7 @@ public class MainActivity extends AppCompatActivity {
 
         ArrayAdapter<String> adapterSensorCrop = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner_item_layout, arraySensorCrop);
         spinnerSensorType.setAdapter(adapterSensorCrop);
+        spinnerSensorType.setVisibility(View.VISIBLE);
         spinnerSensorType.setEnabled(true);
         spinnerSensorType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -189,6 +213,8 @@ public class MainActivity extends AppCompatActivity {
                     chosenCropType = position;
                     sensorTypeValue = Double.parseDouble(arraySensorCrop[position]);
                     spinnerSensorType.setSelection(position);
+                    radioCropFrame.setEnabled(false);
+                    radioFullFrame.setEnabled(false);
                     spinnerSensorType.setEnabled(false);
                     getFocalLength();
 
@@ -197,23 +223,26 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
             }
         });
     }
 
     private void getFocalLength() {
 
-        cardFocalLength.setVisibility(View.VISIBLE);
+        View view = root.getChildAt(count);
+        animateViewIn(view);
+        count++;
         textFocalLength.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     inputFocalLength = Double.parseDouble(textFocalLength.getText().toString());
                     textFocalLength.setEnabled(false);
                     getShutterSpeed();
                     return true;
                 }
+
                 return false;
             }
         });
@@ -221,7 +250,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void getShutterSpeed() {
 
-        cardShutterSpeed.setVisibility(View.VISIBLE);
+        View view = root.getChildAt(count);
+        animateViewIn(view);
+        count++;
         shutterSpeed = 500 / (inputFocalLength * sensorTypeValue);
         String trail = getResources().getString(R.string.trail);
         trail = trail + (String.valueOf(((int) shutterSpeed + 1)));
@@ -252,6 +283,7 @@ public class MainActivity extends AppCompatActivity {
         arraySensorCrop = new String[]{};
         sensorTypeValue = -1.0;
         chosenCropType = -1;
+        count = 0;
 
         textStill.setText(null);
         textTrail.setText(null);
@@ -262,6 +294,20 @@ public class MainActivity extends AppCompatActivity {
         textFocalLength.setText(null);
 
         getManufacturer();
+    }
+
+    private void animateViewIn(View view) {
+
+        view.setVisibility(View.VISIBLE);
+        view.setTranslationY(offset);
+        view.setAlpha(0.85f);
+        view.animate()
+                .translationY(0f)
+                .alpha(1f)
+                .setInterpolator(interpolator)
+                .setDuration(1000L)
+                .start();
+
     }
 
 }

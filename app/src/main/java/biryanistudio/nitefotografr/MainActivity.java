@@ -3,7 +3,6 @@ package biryanistudio.nitefotografr;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.view.KeyEvent;
@@ -40,6 +39,9 @@ public class MainActivity extends AppCompatActivity {
     double sensorTypeValue = -1.0;
     double inputFocalLength = -1.0;
     double shutterSpeed = -1.0;
+
+    boolean isFirstSelectManufacturer = true;
+    boolean isFirstSelectCropType = true;
 
     String[] arrayManufacturer = new String[]{};
     String[] arraySensorCrop = new String[]{};
@@ -96,28 +98,24 @@ public class MainActivity extends AppCompatActivity {
         ArrayAdapter<String> adapterManufacturer = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner_item_layout, arrayManufacturer);
         spinnerManufacturer.setAdapter(adapterManufacturer);
         spinnerManufacturer.setEnabled(true);
-        //((TextView)spinnerManufacturer.getChildAt(0)).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textPrimary));
         spinnerManufacturer.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 chosenManufacturer = position;
                 if (chosenManufacturer == 0) {
-                    Snackbar.make(view, "Please choose your camera Manufacturer", Snackbar.LENGTH_LONG).show();
-                    spinnerManufacturer.setSelection(position);
+                    if (isFirstSelectManufacturer) {
+                        isFirstSelectManufacturer = !isFirstSelectManufacturer;
+                    } else
+                        Snackbar.make(view, "Please choose your camera Manufacturer", Snackbar.LENGTH_LONG).show();
                 } else {
                     spinnerManufacturer.setSelection(position);
                     spinnerManufacturer.setEnabled(false);
-                    //((TextView)spinnerManufacturer.getChildAt(0)).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textSecondary));
                     getCropType();
                 }
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                if (chosenManufacturer == 0) {
-                    Snackbar.make(spinnerManufacturer.getRootView(), "Please choose your camera Manufacturer", Snackbar.LENGTH_LONG).show();
-
-                }
             }
         });
     }
@@ -129,6 +127,7 @@ public class MainActivity extends AppCompatActivity {
         radioSensorType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
+
                 if (checkedId == R.id.radioFullFrame) {
                     sensorTypeValue = 1.0;
                     radioFullFrame.setEnabled(false);
@@ -180,16 +179,20 @@ public class MainActivity extends AppCompatActivity {
         ArrayAdapter<String> adapterSensorCrop = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner_item_layout, arraySensorCrop);
         spinnerSensorType.setAdapter(adapterSensorCrop);
         spinnerSensorType.setEnabled(true);
-        ((TextView) spinnerSensorType.getChildAt(0)).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textPrimary));
         spinnerSensorType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                chosenCropType = position;
-                sensorTypeValue = Double.parseDouble(arraySensorCrop[position]);
-                spinnerSensorType.setSelection(position);
-                spinnerSensorType.setEnabled(false);
-                ((TextView) spinnerSensorType.getChildAt(0)).setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.textSecondary));
-                getFocalLength();
+
+                if (isFirstSelectCropType) {
+                    isFirstSelectCropType = !isFirstSelectCropType;
+                } else {
+                    chosenCropType = position;
+                    sensorTypeValue = Double.parseDouble(arraySensorCrop[position]);
+                    spinnerSensorType.setSelection(position);
+                    spinnerSensorType.setEnabled(false);
+                    getFocalLength();
+
+                }
             }
 
             @Override
@@ -233,23 +236,31 @@ public class MainActivity extends AppCompatActivity {
 
     private void resetAll() {
 
-        textStill.setText(null);
-        textTrail.setText(null);
-        shutterSpeed = -1.0;
         cardShutterSpeed.setVisibility(View.GONE);
-        inputFocalLength = -1.0;
-        textFocalLength.setEnabled(true);
         cardFocalLength.setVisibility(View.GONE);
-        sensorTypeValue = -1.0;
-        chosenCropType = -1;
-        textFocalLength.setText(null);
+        cardSensorType.setVisibility(View.GONE);
+        cardManufacturer.setVisibility(View.GONE);
+
+        isFirstSelectManufacturer = true;
+        chosenManufacturer = -1;
+        arrayManufacturer = new String[]{};
+
+        isFirstSelectCropType = true;
         radioCropFrame.setEnabled(true);
         radioFullFrame.setEnabled(true);
         radioSensorType.clearCheck();
-        chosenManufacturer = -1;
-        cardSensorType.setVisibility(View.GONE);
         arraySensorCrop = new String[]{};
-        arrayManufacturer = new String[]{};
+        sensorTypeValue = -1.0;
+        chosenCropType = -1;
+
+        textStill.setText(null);
+        textTrail.setText(null);
+        shutterSpeed = -1.0;
+
+        inputFocalLength = -1.0;
+        textFocalLength.setEnabled(true);
+        textFocalLength.setText(null);
+
         getManufacturer();
     }
 

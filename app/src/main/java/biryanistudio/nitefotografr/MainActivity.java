@@ -1,5 +1,7 @@
 package biryanistudio.nitefotografr;
 
+import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -7,6 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.Interpolator;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -40,8 +45,17 @@ public class MainActivity extends AppCompatActivity {
     double inputFocalLength = -1.0;
     double shutterSpeed = -1.0;
 
+    boolean isFirstSelectManufacturer = true;
+    boolean isFirstSelectCropType = true;
+
     String[] arrayManufacturer = new String[]{};
     String[] arraySensorCrop = new String[]{};
+
+    ViewGroup root;
+    View animationView;
+    int count = 0;
+    float offset = 0;
+    Interpolator interpolator;
 
 
     @Override
@@ -85,49 +99,68 @@ public class MainActivity extends AppCompatActivity {
         cardFocalLength.setVisibility(View.GONE);
         cardShutterSpeed.setVisibility(View.GONE);
 
+        root = (ViewGroup) findViewById(R.id.linearLayout);
+        interpolator = AnimationUtils.loadInterpolator(this, android.R.interpolator.linear_out_slow_in);
+
+        Configuration configuration = getResources().getConfiguration();
+        offset = configuration.screenHeightDp;
+
         getManufacturer();
 
     }
 
     private void getManufacturer() {
-        cardManufacturer.setVisibility(View.VISIBLE);
+
+        animationView = root.getChildAt(count);
+        animateViewIn(animationView);
+        animatePushUp(animationView);
+        count++;
         arrayManufacturer = getResources().getStringArray(R.array.manufacturerList);
         ArrayAdapter<String> adapterManufacturer = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner_item_layout, arrayManufacturer);
         spinnerManufacturer.setAdapter(adapterManufacturer);
+        spinnerManufacturer.setEnabled(true);
         spinnerManufacturer.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 chosenManufacturer = position;
                 if (chosenManufacturer == 0) {
-                    Snackbar.make(view, "Please choose your camera Manufacturer", Snackbar.LENGTH_LONG).show();
-                    spinnerManufacturer.setSelection(position);
+                    if (isFirstSelectManufacturer) {
+                        isFirstSelectManufacturer = !isFirstSelectManufacturer;
+                    } else
+                        Snackbar.make(view, "Please choose your camera Manufacturer", Snackbar.LENGTH_LONG).show();
                 } else {
                     spinnerManufacturer.setSelection(position);
                     spinnerManufacturer.setEnabled(false);
+                    animatePullDown(animationView);
                     getCropType();
                 }
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                if (chosenManufacturer == 0) {
-                    Snackbar.make(spinnerManufacturer.getRootView(), "Please choose your camera Manufacturer", Snackbar.LENGTH_LONG).show();
-
-                }
             }
         });
     }
 
+
     private void getCropType() {
-        cardSensorType.setVisibility(View.VISIBLE);
+
+        animationView = root.getChildAt(count);
+        animateViewIn(animationView);
+        animatePushUp(animationView);
+        count++;
+        spinnerSensorType.setVisibility(View.GONE);
         spinnerSensorType.setEnabled(false);
         radioSensorType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
+
                 if (checkedId == R.id.radioFullFrame) {
                     sensorTypeValue = 1.0;
                     radioFullFrame.setEnabled(false);
                     radioCropFrame.setEnabled(false);
+                    animatePullDown(animationView);
                     getFocalLength();
                 } else if (checkedId == R.id.radioCropFrame) {
                     switch (chosenManufacturer) {
@@ -139,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
                             sensorTypeValue = 1.5;
                             radioFullFrame.setEnabled(false);
                             radioCropFrame.setEnabled(false);
+                            animatePullDown(animationView);
                             getFocalLength();
                             break;
                         case 1:
@@ -174,36 +208,52 @@ public class MainActivity extends AppCompatActivity {
 
         ArrayAdapter<String> adapterSensorCrop = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner_item_layout, arraySensorCrop);
         spinnerSensorType.setAdapter(adapterSensorCrop);
+        spinnerSensorType.setVisibility(View.VISIBLE);
         spinnerSensorType.setEnabled(true);
         spinnerSensorType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                chosenCropType = position;
-                sensorTypeValue = Double.parseDouble(arraySensorCrop[position]);
-                spinnerSensorType.setSelection(position);
-                spinnerSensorType.setEnabled(false);
-                getFocalLength();
+
+                if (isFirstSelectCropType) {
+                    isFirstSelectCropType = !isFirstSelectCropType;
+                } else {
+                    chosenCropType = position;
+                    sensorTypeValue = Double.parseDouble(arraySensorCrop[position]);
+                    spinnerSensorType.setSelection(position);
+                    radioCropFrame.setEnabled(false);
+                    radioFullFrame.setEnabled(false);
+                    spinnerSensorType.setEnabled(false);
+                    animatePullDown(animationView);
+                    getFocalLength();
+
+                }
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
             }
         });
     }
 
     private void getFocalLength() {
 
-        cardFocalLength.setVisibility(View.VISIBLE);
+        animationView = root.getChildAt(count);
+        animateViewIn(animationView);
+        animatePushUp(animationView);
+        count++;
+        textFocalLength.setEnabled(true);
         textFocalLength.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     inputFocalLength = Double.parseDouble(textFocalLength.getText().toString());
                     textFocalLength.setEnabled(false);
+                    animatePullDown(animationView);
                     getShutterSpeed();
                     return true;
                 }
+
                 return false;
             }
         });
@@ -211,7 +261,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void getShutterSpeed() {
 
-        cardShutterSpeed.setVisibility(View.VISIBLE);
+        animationView = root.getChildAt(count);
+        animateViewIn(animationView);
+        animatePushUp(animationView);
         shutterSpeed = 500 / (inputFocalLength * sensorTypeValue);
         String trail = getResources().getString(R.string.trail);
         trail = trail + (String.valueOf(((int) shutterSpeed + 1)));
@@ -226,21 +278,92 @@ public class MainActivity extends AppCompatActivity {
 
     private void resetAll() {
 
+        animatePullDown(animationView);
+
+        while (count >= 0) {
+            animateViewOut(root.getChildAt(count));
+            count--;
+        }
+        cardShutterSpeed.setVisibility(View.GONE);
+        cardFocalLength.setVisibility(View.GONE);
+        cardSensorType.setVisibility(View.GONE);
+        cardManufacturer.setVisibility(View.GONE);
+
+        isFirstSelectManufacturer = true;
+        chosenManufacturer = -1;
+        arrayManufacturer = new String[]{};
+
+        isFirstSelectCropType = true;
+        radioCropFrame.setEnabled(true);
+        radioFullFrame.setEnabled(true);
+        radioSensorType.clearCheck();
+        arraySensorCrop = new String[]{};
+        sensorTypeValue = -1.0;
+        chosenCropType = -1;
+        count = 0;
+
         textStill.setText(null);
         textTrail.setText(null);
         shutterSpeed = -1.0;
-        cardShutterSpeed.setVisibility(View.GONE);
+
         inputFocalLength = -1.0;
-        textFocalLength.setEnabled(true);
-        cardFocalLength.setVisibility(View.GONE);
-        sensorTypeValue = -1.0;
-        chosenCropType = -1;
-        radioCropFrame.setEnabled(true);
-        radioFullFrame.setEnabled(true);
-        chosenManufacturer = -1;
-        cardSensorType.setVisibility(View.GONE);
-        arraySensorCrop = new String[]{};
-        arrayManufacturer = new String[]{};
+        textFocalLength.setText(null);
+
         getManufacturer();
     }
+
+    private void animateViewIn(View view) {
+
+        view.setVisibility(View.VISIBLE);
+        view.setTranslationY(-3 * offset);
+        view.setAlpha(0f);
+        view.animate()
+                .translationY(0f)
+                .alpha(1f)
+                .setInterpolator(interpolator)
+                .setDuration(1000)
+                .start();
+
+    }
+
+    private void animateViewOut(View view) {
+
+        view.setVisibility(View.VISIBLE);
+        view.setTranslationY(0f);
+        view.setAlpha(1f);
+        view.animate()
+                .translationY(-3 * offset)
+                .alpha(0f)
+                .setInterpolator(interpolator)
+                .setDuration(1000)
+                .start();
+
+    }
+
+    private void animatePushUp(View view) {
+
+        view.setVisibility(View.VISIBLE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            view.animate()
+                    .translationZ(10f)
+                    .setInterpolator(interpolator)
+                    .setDuration(300)
+                    .start();
+        }
+
+    }
+
+    private void animatePullDown(View view) {
+
+        view.setVisibility(View.VISIBLE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            view.animate()
+                    .translationZ(-10f)
+                    .setInterpolator(interpolator)
+                    .setDuration(300)
+                    .start();
+        }
+
+    }
+
 }

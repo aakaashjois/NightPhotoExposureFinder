@@ -315,13 +315,11 @@ public class MainActivity extends AppCompatActivity {
     private void animateViewIn(View view) {
 
         view.setVisibility(View.VISIBLE);
-        view.setTranslationY(-3 * offset);
         view.setAlpha(0f);
         view.animate()
-                .translationY(0f)
                 .alpha(1f)
                 .setInterpolator(interpolator)
-                .setDuration(1000)
+                .setDuration(500)
                 .start();
 
     }
@@ -329,10 +327,8 @@ public class MainActivity extends AppCompatActivity {
     private void animateViewOut(View view) {
 
         view.setVisibility(View.VISIBLE);
-        view.setTranslationY(0f);
         view.setAlpha(1f);
         view.animate()
-                .translationY(-3 * offset)
                 .alpha(0f)
                 .setInterpolator(interpolator)
                 .setDuration(1000)
@@ -345,7 +341,7 @@ public class MainActivity extends AppCompatActivity {
         view.setVisibility(View.VISIBLE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             view.animate()
-                    .translationZ(10f)
+                    .translationZ(15f)
                     .setInterpolator(interpolator)
                     .setDuration(300)
                     .start();
@@ -358,7 +354,7 @@ public class MainActivity extends AppCompatActivity {
         view.setVisibility(View.VISIBLE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             view.animate()
-                    .translationZ(-10f)
+                    .translationZ(-15f)
                     .setInterpolator(interpolator)
                     .setDuration(300)
                     .start();

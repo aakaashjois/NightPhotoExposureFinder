@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
             float originalYPos = toAnimateView.getX();
             toAnimateView.setTranslationX(width);
             toAnimateView.animate().translationXBy(originalYPos - width)
-                    .setInterpolator(interpolator).setStartDelay(i * 100).setDuration(750).start();
+                    .setInterpolator(interpolator).setStartDelay(i * 100).setDuration(1000).start();
         }
     }
 
@@ -121,7 +121,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void getCropType() {
-        yesManufacturer();
         radioSensorType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {

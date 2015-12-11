@@ -3,6 +3,8 @@ package biryanistudio.nitefotografr;
 import android.content.Context;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Display;
 import android.view.KeyEvent;
@@ -22,15 +24,25 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
-    @Bind(R.id.spinnerManufacturer) Spinner spinnerManufacturer;
-    @Bind(R.id.radioSensorType) RadioGroup radioSensorType;
-    @Bind(R.id.spinnerSensorType) Spinner spinnerSensorType;
-    @Bind(R.id.textFocalLength) EditText textFocalLength;
-    @Bind(R.id.textTrail) TextView textTrail;
-    @Bind(R.id.textStill) TextView textStill;
+    @Bind(R.id.spinnerManufacturer)
+    Spinner spinnerManufacturer;
+    @Bind(R.id.radioSensorType)
+    RadioGroup radioSensorType;
+    @Bind(R.id.spinnerSensorType)
+    Spinner spinnerSensorType;
+    @Bind(R.id.textFocalLength)
+    EditText textFocalLength;
+    @Bind(R.id.textTrail)
+    TextView textTrail;
+    @Bind(R.id.textStill)
+    TextView textStill;
+    @Bind(R.id.coordinatorLayout)
+    CoordinatorLayout coordinatorLayout;
+
 
     int chosenManufacturer = -1;
     double sensorTypeValue = -1.0;
+    boolean isFirstRun = true;
 
     String[] arraySensorCrop = new String[]{};
 
@@ -55,14 +67,15 @@ public class MainActivity extends AppCompatActivity {
         Display display = getWindowManager().getDefaultDisplay();
         Point p = new Point();
         display.getSize(p);
-        int height = p.y;
+        int width = p.x;
+
         AccelerateDecelerateInterpolator interpolator = new AccelerateDecelerateInterpolator();
-        for(int i = 0;i<linearLayout.getChildCount();i++) {
+        for (int i = 0; i < linearLayout.getChildCount(); i++) {
             View toAnimateView = linearLayout.getChildAt(i);
-            float originalYPos = toAnimateView.getY();
-            toAnimateView.setTranslationY(height);
-            toAnimateView.animate().translationYBy(originalYPos-height)
-                    .setInterpolator(interpolator).setStartDelay(i*125).setDuration(500).start();
+            float originalYPos = toAnimateView.getX();
+            toAnimateView.setTranslationX(width);
+            toAnimateView.animate().translationXBy(originalYPos - width)
+                    .setInterpolator(interpolator).setStartDelay(i * 100).setDuration(750).start();
         }
     }
 
@@ -75,11 +88,28 @@ public class MainActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 chosenManufacturer = position;
                 switch (chosenManufacturer) {
+                    case 0:
+                        if (isFirstRun)
+                            isFirstRun = !isFirstRun;
+                        else {
+                            noManufacturer();
+                            Snackbar.make(coordinatorLayout, "Please choose a Manufacturer", Snackbar.LENGTH_LONG).show();
+                        }
+                        break;
                     case 2:
                     case 3:
                     case 7:
                     case 9:
+                        yesManufacturer();
                         spinnerSensorType.setVisibility(View.GONE);
+                        break;
+                    case 1:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 8:
+                        yesManufacturer();
+                        break;
                 }
             }
 
@@ -91,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void getCropType() {
+        yesManufacturer();
         radioSensorType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -156,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     String inputText = textFocalLength.getText().toString();
-                    if(!inputText.isEmpty()) {
+                    if (!inputText.isEmpty()) {
                         double inputFocalLength = Double.parseDouble(inputText);
                         InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                         inputManager.hideSoftInputFromWindow(textFocalLength.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
@@ -180,8 +211,31 @@ public class MainActivity extends AppCompatActivity {
             still = still + (String.valueOf(((int) shutterSpeed - 1)));
             still = still + getResources().getString(R.string.seconds);
             textStill.setText(still);
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void noManufacturer() {
+
+        for (int i = 0; i < radioSensorType.getChildCount(); i++) {
+            radioSensorType.getChildAt(i).setEnabled(false);
+        }
+        spinnerSensorType.setVisibility(View.GONE);
+        textFocalLength.setEnabled(false);
+        textTrail.setEnabled(false);
+        textStill.setEnabled(false);
+
+    }
+
+    private void yesManufacturer() {
+
+        for (int i = 0; i < radioSensorType.getChildCount(); i++) {
+            radioSensorType.getChildAt(i).setEnabled(true);
+        }
+        radioSensorType.clearCheck();
+        textFocalLength.setEnabled(true);
+        textTrail.setEnabled(true);
+        textStill.setEnabled(true);
     }
 }

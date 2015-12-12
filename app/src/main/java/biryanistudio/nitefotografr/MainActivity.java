@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
             float originalYPos = toAnimateView.getX();
             toAnimateView.setTranslationX(width);
             toAnimateView.animate().translationXBy(originalYPos - width)
-                    .setInterpolator(interpolator).setStartDelay(i * 100).setDuration(1000).start();
+                    .setInterpolator(interpolator).setStartDelay(i * 100).setDuration(500).start();
         }
     }
 

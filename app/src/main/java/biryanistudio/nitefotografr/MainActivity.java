@@ -39,11 +39,10 @@ public class MainActivity extends AppCompatActivity {
     @Bind(R.id.coordinatorLayout)
     CoordinatorLayout coordinatorLayout;
 
-
     int chosenManufacturer = -1;
     double sensorTypeValue = -1.0;
     boolean isFirstRun = true;
-
+    boolean isFirstCrop = true;
     String[] arraySensorCrop = new String[]{};
 
     @Override
@@ -121,6 +120,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void getCropType() {
+        radioSensorType.clearCheck();
+        sensorTypeValue = -1;
         radioSensorType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -167,16 +168,34 @@ public class MainActivity extends AppCompatActivity {
         spinnerSensorType.setVisibility(View.VISIBLE);
         ArrayAdapter<String> adapterSensorCrop = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner_item_layout, arraySensorCrop);
         spinnerSensorType.setAdapter(adapterSensorCrop);
+        spinnerSensorType.setSelection(0);
         spinnerSensorType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position != 0) sensorTypeValue = Double.parseDouble(arraySensorCrop[position]);
-            }
+                                                        @Override
+                                                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                                            if (position == 0) {
+                                                                if (isFirstCrop)
+                                                                    isFirstCrop = !isFirstCrop;
+                                                                else {
+                                                                    Snackbar.make(coordinatorLayout, "Please select the Crop Factor", Snackbar.LENGTH_LONG).show();
+                                                                    textFocalLength.setEnabled(false);
+                                                                    textStill.setEnabled(false);
+                                                                    textTrail.setEnabled(false);
+                                                                }
+                                                            } else {
+                                                                textFocalLength.setEnabled(true);
+                                                                textFocalLength.getText().clear();
+                                                                textStill.setEnabled(true);
+                                                                textTrail.setEnabled(true);
+                                                                sensorTypeValue = Double.parseDouble(arraySensorCrop[position]);
+                                                            }
+                                                        }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
+                                                        @Override
+                                                        public void onNothingSelected(AdapterView<?> parent) {
+                                                        }
+                                                    }
+
+        );
     }
 
     private void getFocalLength() {

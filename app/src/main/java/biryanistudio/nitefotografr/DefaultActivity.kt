@@ -8,6 +8,7 @@ import android.widget.NumberPicker
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
+import com.biryanistudio.nightphotoexposurefinder.R
 import kotlinx.android.synthetic.main.activity_default.*
 
 class DefaultActivity : AppCompatActivity(), View.OnClickListener,

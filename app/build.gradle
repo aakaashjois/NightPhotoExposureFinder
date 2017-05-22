@@ -1,7 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'realm-android'
 
 android {
     compileSdkVersion 25
@@ -11,8 +10,8 @@ android {
         applicationId "com.biryanistudio.nightphotoexposurefinder"
         minSdkVersion 18
         targetSdkVersion 25
-        versionCode 3
-        versionName "2.0"
+        versionCode 1
+        versionName "1.0"
     }
     buildTypes {
         release {
